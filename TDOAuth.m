@@ -45,8 +45,7 @@ int TDOAuthUTCTimeOffset = 0;
 
 @implementation NSString (TweetDeck)
 - (id)pcen {
-    NSString* rv = (NSString *) CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) self, NULL, (CFStringRef) @"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
-    return [rv autorelease];
+    return [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 }
 @end
 
@@ -66,7 +65,7 @@ int TDOAuthUTCTimeOffset = 0;
     return self;
 }
 - (id)chomp {
-    const int N = [self length] - 1;
+    const int N = (int)[self length] - 1;
     if (N >= 0)
         [self deleteCharactersInRange:NSMakeRange(N, 1)];
     return self;
@@ -95,21 +94,21 @@ static NSString* base64(const uint8_t* input) {
     }
     out[-2] = map[(input[19] & 0x0F) << 2];
     out[-1] = '=';
-    return [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
+    return [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
 }
 
 static NSString* nonce() {
     CFUUIDRef uuid = CFUUIDCreate(NULL);
     CFStringRef s = CFUUIDCreateString(NULL, uuid);
     CFRelease(uuid);
-    return [(id)s autorelease];
+    return (__bridge NSString *)s;
 }
 
 static NSString* timestamp() {
     time_t t;
     time(&t);
     mktime(gmtime(&t));
-    return [NSString stringWithFormat:@"%u", t + TDOAuthUTCTimeOffset];
+    return [NSString stringWithFormat:@"%lu", t + TDOAuthUTCTimeOffset];
 }
 
 
@@ -258,8 +257,6 @@ static NSString* timestamp() {
     oauth->url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@://%@%@", scheme, host, path]];
 
     NSURLRequest *rq = [oauth request];
-    [oauth->url release];
-    [oauth release];
     return rq;
 }
 
@@ -287,11 +284,8 @@ static NSString* timestamp() {
     if (postbody.length) {
         [rq setHTTPBody:[postbody dataUsingEncoding:NSUTF8StringEncoding]];
         [rq setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-        [rq setValue:[NSString stringWithFormat:@"%u", rq.HTTPBody.length] forHTTPHeaderField:@"Content-Length"];
+        [rq setValue:[NSString stringWithFormat:@"%lu", rq.HTTPBody.length] forHTTPHeaderField:@"Content-Length"];
     }
-
-    [oauth->url release];
-    [oauth release];
 
     return rq;
 }
