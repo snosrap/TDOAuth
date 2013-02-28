@@ -119,6 +119,7 @@ static NSString* timestamp() {
            consumerSecret:(NSString *)consumerSecret
               accessToken:(NSString *)accessToken
               tokenSecret:(NSString *)tokenSecret
+                 verifier:(NSString *)verifier
 {
     params = [NSDictionary dictionaryWithObjectsAndKeys:
               consumerKey,  @"oauth_consumer_key",
@@ -127,6 +128,7 @@ static NSString* timestamp() {
               @"1.0",       @"oauth_version",
               @"HMAC-SHA1", @"oauth_signature_method",
               accessToken,  @"oauth_token",
+              verifier?verifier:@"", @"oauth_verifier",
               // LEAVE accessToken last or you'll break XAuth attempts
               nil];
     signature_secret = [NSString stringWithFormat:@"%@&%@", consumerSecret, tokenSecret ?: @""];
@@ -219,7 +221,8 @@ static NSString* timestamp() {
                        consumerKey:consumerKey
                     consumerSecret:consumerSecret
                        accessToken:accessToken
-                       tokenSecret:tokenSecret];
+                       tokenSecret:tokenSecret
+                          verifier:nil];
 }
 
 + (NSURLRequest *)URLRequestForPath:(NSString *)unencodedPathWithoutQuery
@@ -229,7 +232,8 @@ static NSString* timestamp() {
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
-                        tokenSecret:(NSString *)tokenSecret;
+                        tokenSecret:(NSString *)tokenSecret
+                           verifier:(NSString *)verifier;
 {
     if (!host || !unencodedPathWithoutQuery)
         return nil;
@@ -237,7 +241,8 @@ static NSString* timestamp() {
     TDOAuth *oauth = [[TDOAuth alloc] initWithConsumerKey:consumerKey
                                            consumerSecret:consumerSecret
                                               accessToken:accessToken
-                                              tokenSecret:tokenSecret];
+                                              tokenSecret:tokenSecret
+                                                 verifier:verifier];
 
     // We don't use pcen as we don't want to percent encode eg. /, this
     // is perhaps not the most all encompassing solution, but in practice
@@ -274,7 +279,8 @@ static NSString* timestamp() {
     TDOAuth *oauth = [[TDOAuth alloc] initWithConsumerKey:consumerKey
                                            consumerSecret:consumerSecret
                                               accessToken:accessToken
-                                              tokenSecret:tokenSecret];
+                                              tokenSecret:tokenSecret
+                                                 verifier:nil];
     oauth->url = [[NSURL alloc] initWithScheme:@"https" host:host path:unencodedPath];
     oauth->method = @"POST";
 

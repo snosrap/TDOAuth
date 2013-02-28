@@ -68,7 +68,8 @@
                         consumerKey:(NSString *)consumerKey
                      consumerSecret:(NSString *)consumerSecret
                         accessToken:(NSString *)accessToken
-                        tokenSecret:(NSString *)tokenSecret;
+                        tokenSecret:(NSString *)tokenSecret
+                           verifier:(NSString *)verifier;
 
 /**
   We always POST with HTTPS. This is because at least half the time the user's
