@@ -171,7 +171,8 @@ static NSString* timestamp() {
     NSMutableString *header = [NSMutableString stringWithCapacity:512];
     [header add:@"OAuth "];
     for (NSString *key in params.allKeys)
-        [[[[header add:key] add:@"=\""] add:[params objectForKey:key]] add:@"\", "];
+        if([key hasPrefix:@"oauth_"])
+            [[[[header add:key] add:@"=\""] add:[params objectForKey:key]] add:@"\", "];
     [[[header add:@"oauth_signature=\""] add:self.signature.pcen] add:@"\""];
     return header;
 }
