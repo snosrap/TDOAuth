@@ -45,7 +45,11 @@ int TDOAuthUTCTimeOffset = 0;
 
 @implementation NSString (TweetDeck)
 - (id)pcen {
-    return [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                                 (__bridge CFStringRef)self,
+                                                                                 NULL,
+                                                                                 (CFStringRef)@"!*'();:@&=+$,/?%#[]",
+                                                                                 kCFStringEncodingUTF8);
 }
 @end
 
